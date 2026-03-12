@@ -48,6 +48,15 @@ body{background:#080808;color:#e8e8e0;font-family:'DM Sans',sans-serif;display:f
 .live-timer{font-size:11px;color:#2a2a2a;font-family:monospace;margin-left:2px}
 
 .logout-btn{background:none;border:1px solid var(--border2);border-radius:5px;color:#222;font-size:10px;cursor:pointer;padding:5px 10px;font-family:monospace;letter-spacing:.06em;text-decoration:none;transition:all .15s}
+.key-input-row{display:none;padding:10px 14px 4px;background:rgba(200,255,0,.03);border:1px solid rgba(200,255,0,.08);border-top:none;border-radius:0 0 10px 10px;margin-top:-6px;margin-bottom:4px}
+.key-input-row.show{display:block;animation:fadeUp .2s ease both}
+.key-input-label{font-size:10px;color:#333;font-family:monospace;line-height:1.6}
+.key-input{flex:1;background:#060606;border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:#888;font-size:11px;font-family:monospace;outline:none;transition:border-color .15s}
+.key-input:focus{border-color:rgba(200,255,0,.25)}
+.key-input::placeholder{color:#1e1e1e}
+.key-save-btn{background:var(--lime);color:#080808;border:none;border-radius:6px;padding:0 14px;font-weight:800;font-size:11px;cursor:pointer;font-family:monospace;white-space:nowrap;transition:all .15s}
+.key-save-btn:hover{background:#d6ff2a}
+
 .logout-btn:hover{border-color:#333;color:#555}
 
 /* ── LAYOUT ── */
@@ -349,9 +358,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
             <div class="svc-status partial-color" id="st-kick">Partial — <button class="limit-toggle" onclick="toggleNote('kick-note')">see limitations</button></div>
           </div>
         </div>
-        <button class="conn-btn" id="cb-kick" onclick="toggleSvc('kick')">Connect</button>
+        <button class="conn-btn" id="cb-kick" onclick="toggleSvcKey('kick')">Connect</button>
       </div>
       <div class="limit-note" id="kick-note">⚠ Analytics unavailable due to Kick API restrictions.</div>
+      <div class="key-input-row" id="ki-kick">
+        <div class="key-input-label">Stream key — find it in Kick → Creator Dashboard → Stream</div>
+        <div style="display:flex;gap:7px;margin-top:6px">
+          <input class="key-input" id="key-kick" type="password" placeholder="Paste your Kick stream key…"/>
+          <button class="key-save-btn" onclick="saveKey('kick')">Save</button>
+        </div>
+      </div>
 
       <!-- TikTok -->
       <div class="svc-row" id="svc-tiktok">
@@ -364,9 +380,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
             <div class="svc-status partial-color" id="st-tiktok">Partial — <button class="limit-toggle" onclick="toggleNote('tiktok-note')">see limitations</button></div>
           </div>
         </div>
-        <button class="conn-btn" id="cb-tiktok" onclick="toggleSvc('tiktok')">Connect</button>
+        <button class="conn-btn" id="cb-tiktok" onclick="toggleSvcKey('tiktok')">Connect</button>
       </div>
       <div class="limit-note" id="tiktok-note">⚠ Follower alerts only. Chat is read-only. No analytics.</div>
+      <div class="key-input-row" id="ki-tiktok">
+        <div class="key-input-label">Stream key — find it in TikTok LIVE Studio → Go Live → Stream Key</div>
+        <div style="display:flex;gap:7px;margin-top:6px">
+          <input class="key-input" id="key-tiktok" type="password" placeholder="Paste your TikTok stream key…"/>
+          <button class="key-save-btn" onclick="saveKey('tiktok')">Save</button>
+        </div>
+      </div>
 
       <!-- Facebook -->
       <div class="svc-row" id="svc-facebook">
@@ -379,9 +402,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
             <div class="svc-status partial-color" id="st-facebook">Partial — <button class="limit-toggle" onclick="toggleNote('facebook-note')">see limitations</button></div>
           </div>
         </div>
-        <button class="conn-btn" id="cb-facebook" onclick="toggleSvc('facebook')">Connect</button>
+        <button class="conn-btn" id="cb-facebook" onclick="toggleSvcKey('facebook')">Connect</button>
       </div>
       <div class="limit-note" id="facebook-note">⚠ No donation alerts. Analytics delayed up to 24 hours.</div>
+      <div class="key-input-row" id="ki-facebook">
+        <div class="key-input-label">Stream key — find it in Facebook → Live Producer → Create Live Video → Stream Key</div>
+        <div style="display:flex;gap:7px;margin-top:6px">
+          <input class="key-input" id="key-facebook" type="password" placeholder="Paste your Facebook stream key…"/>
+          <button class="key-save-btn" onclick="saveKey('facebook')">Save</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -657,6 +687,53 @@ function toggleSvc(id) {
     return;
   }
   renderPlatChips(); renderChecklist(); updateGoLiveBtn();
+}
+
+// Key-based connection (Kick, TikTok, Facebook)
+function toggleSvcKey(id) {
+  const svc = SVCS[id];
+  const btn = document.getElementById("cb-"+id);
+  const st  = document.getElementById("st-"+id);
+  const row = document.getElementById("svc-"+id);
+  const ki  = document.getElementById("ki-"+id);
+
+  if (svc.connected) {
+    // Disconnect
+    svc.connected = false;
+    svc.streamKey = null;
+    btn.textContent="Connect"; btn.classList.remove("on");
+    row.classList.remove("connected");
+    st.className="svc-status off"; st.textContent="Not connected";
+    if (ki) ki.classList.remove("show");
+    renderPlatChips(); renderChecklist(); updateGoLiveBtn();
+  } else {
+    // Show key input
+    if (ki) ki.classList.toggle("show");
+  }
+}
+
+function saveKey(id) {
+  const input = document.getElementById("key-"+id);
+  const key = input ? input.value.trim() : "";
+  if (!key) { input.style.borderColor="rgba(255,68,68,.4)"; setTimeout(()=>input.style.borderColor="",1200); return; }
+
+  const svc = SVCS[id];
+  const btn = document.getElementById("cb-"+id);
+  const st  = document.getElementById("st-"+id);
+  const row = document.getElementById("svc-"+id);
+  const ki  = document.getElementById("ki-"+id);
+
+  btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
+  setTimeout(() => {
+    svc.connected = true;
+    svc.streamKey = key;
+    btn.disabled=false; btn.textContent="Disconnect"; btn.classList.add("on");
+    row.classList.add("connected");
+    st.className="svc-status ok"; st.textContent="Connected ✓";
+    if (ki) ki.classList.remove("show");
+    input.value = "";
+    renderPlatChips(); renderChecklist(); updateGoLiveBtn();
+  }, 700);
 }
 
 function toggleNote(id) {
