@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VitaaMain — Stream Smarter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#080808;color:#e8e8e0;font-family:'DM Sans',sans-serif;overflow-x:hidden}
+:root{--lime:#c8ff00;--bg:#080808;--bg2:#0a0a0a;--bg3:#0d0d0d;--border:#141414;--border2:#1c1c1c;--text-dim:#333;--text-mid:#555}
+
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-33.333%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:15px 40px;display:flex;align-items:center;justify-content:space-between;transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+nav.scrolled{background:rgba(8,8,8,.97);backdrop-filter:blur(20px);border-color:var(--border)}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.12em;color:#fff;display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none}
+.logo-dot{width:8px;height:8px;background:var(--lime);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+.nav-links{display:flex;gap:28px}
+.nav-link{font-size:13px;font-weight:500;color:#3a3a3a;text-decoration:none;transition:color .15s}
+.nav-link:hover{color:#ccc}
+.btn-lime{background:var(--lime);color:#080808;font-weight:800;font-size:11px;padding:9px 18px;border-radius:6px;border:none;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .15s;text-decoration:none;display:inline-block}
+.btn-lime:hover{transform:translateY(-1px);background:#d6ff2a;box-shadow:0 4px 20px rgba(200,255,0,.2)}
+.btn-lime-lg{background:var(--lime);color:#080808;font-weight:800;font-size:12px;padding:15px 34px;border-radius:8px;border:none;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-lime-lg:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(200,255,0,.25);background:#d6ff2a}
+.btn-ghost-nav{background:none;border:none;color:#3a3a3a;font-size:13px;font-weight:500;cursor:pointer;padding:8px 12px;font-family:'DM Sans',sans-serif;transition:color .15s;text-decoration:none}
+.btn-ghost-nav:hover{color:#ccc}
+
+/* TICKER */
+.ticker-wrap{overflow:hidden;border-top:1px solid #181818;border-bottom:1px solid #181818;padding:10px 0;background:#050505}
+.ticker-track{display:flex;gap:44px;animation:ticker 32s linear infinite;width:max-content}
+.ticker-item{font-size:10px;font-weight:700;color:#222;letter-spacing:.16em;text-transform:uppercase;font-family:monospace;white-space:nowrap}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;padding:92px 40px 80px;min-height:95vh;display:flex;align-items:center}
+.hero-grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:56px 56px;-webkit-mask-image:radial-gradient(ellipse 85% 85% at 50% 50%,black 10%,transparent 100%);mask-image:radial-gradient(ellipse 85% 85% at 50% 50%,black 10%,transparent 100%)}
+.hero-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 60% 40%,rgba(200,255,0,.04) 0%,transparent 70%),radial-gradient(ellipse 35% 45% at 10% 80%,rgba(68,0,255,.04) 0%,transparent 65%)}
+.hero-inner{position:relative;z-index:1;max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.05fr 1fr;gap:64px;align-items:center}
+.hero-eyebrow{animation:fadeUp .6s cubic-bezier(.16,1,.3,1) .05s both;display:inline-flex;align-items:center;gap:8px;background:rgba(200,255,0,.05);border:1px solid rgba(200,255,0,.12);border-radius:99px;padding:5px 14px;margin-bottom:24px}
+.hero-eyebrow span{font-family:monospace;font-size:10px;color:var(--lime);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.hero-title{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .15s both;font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,9vw,112px);line-height:.9;letter-spacing:.015em;color:#fff;margin-bottom:20px}
+.hero-title span{color:var(--lime)}
+.hero-sub{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .25s both;font-size:15px;color:#424242;line-height:1.8;font-weight:300;max-width:420px;margin-bottom:10px}
+.hero-sub2{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .3s both;font-size:14px;color:#2a2a2a;line-height:1.7;font-style:italic;max-width:420px;margin-bottom:32px}
+.hero-actions{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .35s both;display:flex;gap:16px;align-items:center;margin-bottom:40px}
+.hero-stats{animation:fadeUp .7s cubic-bezier(.16,1,.3,1) .45s both;display:flex;gap:32px}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--lime);letter-spacing:.04em;line-height:1}
+.stat-label{font-size:10px;color:#282828;letter-spacing:.08em;font-family:monospace;margin-top:4px}
+.btn-watch{background:transparent;color:#444;font-size:13px;font-weight:500;padding:15px 0;border:none;cursor:pointer;display:flex;align-items:center;gap:10px;font-family:'DM Sans',sans-serif;transition:color .15s}
+.btn-watch:hover{color:#ccc}
+.play-circle{width:32px;height:32px;border:1.5px solid #1e1e1e;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#3a3a3a;transition:all .15s;flex-shrink:0}
+.btn-watch:hover .play-circle{border-color:#444;color:#ccc}
+
+/* MOCK DASHBOARD */
+.mock-dash{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:16px;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7);animation:fadeUp .9s cubic-bezier(.16,1,.3,1) .4s both}
+.mock-bar{background:#060606;padding:9px 14px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.mock-dot{width:7px;height:7px;border-radius:50%}
+.mock-url{margin-left:8px;font-size:10px;color:#2a2a2a;font-family:monospace}
+.mock-platforms{margin-left:auto;display:flex;gap:5px}
+.mock-plat-badge{height:16px;padding:0 5px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;font-family:monospace}
+.mock-scenes-sources{display:grid;grid-template-columns:108px 1fr;border-bottom:1px solid #111}
+.mock-scenes{border-right:1px solid #111;padding:10px}
+.mock-section-label{font-size:8px;color:#222;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.mock-scene-item{padding:5px 7px;border-radius:4px;margin-bottom:3px;font-size:9px;font-family:monospace}
+.mock-stats-row{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #111}
+.mock-stat{padding:9px 8px;border-right:1px solid #111;text-align:center}
+.mock-stat-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime)}
+.mock-stat-label{font-size:7px;color:#222;font-family:monospace;letter-spacing:.07em;text-transform:uppercase}
+.mock-alert{margin:10px;background:#0d0d0d;border-left:2px solid var(--lime);border-radius:4px;padding:6px 10px;font-size:10px;color:#555;font-family:monospace}
+
+/* MULTISTREAM SECTION */
+.section{padding:100px 40px;max-width:1100px;margin:0 auto}
+.two-col{display:grid;grid-template-columns:1fr 1.1fr;gap:72px;align-items:center}
+.section-eyebrow{font-family:monospace;font-size:10px;font-weight:700;color:var(--lime);letter-spacing:.2em;text-transform:uppercase;margin-bottom:14px}
+.section-title{font-family:'Bebas Neue',sans-serif;letter-spacing:.02em;color:#fff;line-height:.95}
+.section-sub{font-size:14px;color:#424242;line-height:1.85;font-weight:300;max-width:400px;margin-bottom:14px}
+.howit-box{background:var(--bg3);border:1px solid #1a1a1a;border-radius:10px;padding:14px 18px;max-width:380px;margin-bottom:28px}
+.howit-label{font-size:10px;color:rgba(200,255,0,.4);font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.howit-step{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+.step-num{width:18px;height:18px;border-radius:4px;background:rgba(200,255,0,.07);border:1px solid rgba(200,255,0,.15);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--lime);font-family:monospace;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-text{font-size:12px;color:#333;line-height:1.6}
+
+/* MULTISTREAM DIAGRAM */
+.ms-diagram{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:16px;padding:28px;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+.ms-source{background:#111;border:1.5px solid rgba(200,255,0,.2);border-radius:10px;padding:10px 24px;text-align:center;margin-bottom:4px}
+.ms-source-label{font-size:9px;color:rgba(200,255,0,.4);font-family:monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px}
+.ms-source-val{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--lime);letter-spacing:.06em}
+.ms-connector{width:1px;height:18px;background:rgba(200,255,0,.15);margin:0 auto}
+.ms-platforms{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.ms-plat-btn{background:#0d0d0d;border:1.5px solid #1c1c1c;border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:70px}
+.ms-plat-btn.active{box-shadow:0 0 18px rgba(0,0,0,.5)}
+.ms-plat-icon{width:26px;height:26px;border-radius:6px;background:#181818;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#2a2a2a;font-family:monospace;transition:all .2s}
+.ms-plat-name{font-size:9px;color:#2a2a2a;font-family:monospace;font-weight:600;white-space:nowrap;transition:color .2s}
+.ms-plat-dot{width:5px;height:5px;border-radius:50%;background:#1c1c1c;transition:background .2s}
+.ms-alert{background:#1a1800;border:1px solid rgba(200,255,0,.15);border-radius:8px;padding:10px 14px;display:none;animation:slideIn .3s ease both}
+.ms-alert.visible{display:flex;gap:10px;align-items:flex-start}
+.ms-alert-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.ms-alert-title{font-size:11px;color:var(--lime);font-weight:700;font-family:monospace;margin-bottom:3px}
+.ms-alert-body{font-size:11px;color:#5a5030;line-height:1.5}
+.ms-hint{font-size:10px;color:#1e1e1e;font-family:monospace;text-align:center;padding-top:8px}
+
+/* FEATURES GRID */
+.features-section{padding:80px 40px;border-top:1px solid #111;border-bottom:1px solid #111;background:#060606}
+.features-section-inner{max-width:1100px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:48px}
+.feature-pill{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--bg3);border:1px solid #161616;border-radius:8px;transition:all .2s;cursor:default}
+.feature-pill:hover{background:#111;border-color:#222}
+.feature-pill-icon{font-size:14px;flex-shrink:0}
+.feature-pill-label{font-size:12px;font-weight:600;color:#444}
+.features-header{text-align:center;margin-bottom:0}
+
+/* PLATFORMS */
+.platforms-section{padding:100px 40px;max-width:1100px;margin:0 auto}
+.platforms-list{border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.plat-row{display:flex;align-items:center;justify-content:space-between;padding:17px 22px;border-bottom:1px solid #111;transition:background .15s;cursor:default}
+.plat-row:last-child{border-bottom:none}
+.plat-row:hover{background:#0d0d0d}
+.plat-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.plat-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.04em;color:#ccc;display:flex;align-items:center;gap:12px}
+.plat-badge{font-family:monospace;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:4px}
+.plat-badge.full{background:rgba(200,255,0,.07);color:var(--lime);border:1px solid rgba(200,255,0,.15)}
+.plat-badge.partial{background:rgba(255,153,0,.07);color:#ff9900;border:1px solid rgba(255,153,0,.15)}
+
+/* CTA */
+.cta-section{padding:90px 40px 110px;text-align:center;position:relative;overflow:hidden;border-top:1px solid #111}
+.cta-glow{position:absolute;inset:0;background:radial-gradient(ellipse 55% 75% at 50% 50%,rgba(200,255,0,.04) 0%,transparent 70%)}
+.cta-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,96px);color:#fff;letter-spacing:.02em;line-height:.93;margin-bottom:18px;position:relative;z-index:1}
+.cta-title span{color:var(--lime)}
+.cta-sub{font-size:14px;color:#2a2a2a;font-weight:300;margin-bottom:36px;position:relative;z-index:1}
+
+/* FOOTER */
+footer{border-top:1px solid #111;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:10px;color:#1a1a1a;font-family:monospace;letter-spacing:.08em}
+
+@media(max-width:960px){.nav-links{display:none}nav{padding:14px 20px}}
+@media(max-width:720px){.hero-inner,.two-col,.platforms-section .two-col{grid-template-columns:1fr}.mock-dash{display:none}.features-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="logo"><div class="logo-dot"></div>VitaaMain</a>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Features</a>
+    <a href="#platforms" class="nav-link">Platforms</a>
+    <a href="#multistream" class="nav-link">Multi-stream</a>
+    <a href="login.html" class="nav-link">Pricing</a>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <a href="login.html" class="btn-ghost-nav">Log in</a>
+    <a href="login.html" class="btn-lime">Get started free</a>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div style="padding-top:56px">
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker"></div>
+</div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid-bg"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow"><div class="logo-dot" style="width:6px;height:6px"></div><span>Free · Browser-based · No download</span></div>
+      <h1 class="hero-title">ONE TAB.<br>EVERY<br><span>PLATFORM.</span></h1>
+      <p class="hero-sub">VitaaMain is a complete browser-based streaming toolkit. Scenes, audio, overlays, alerts, chat and analytics — all in one dashboard.</p>
+      <p class="hero-sub2">Stream to Twitch, YouTube, Kick and more simultaneously — your device does the heavy lifting.</p>
+      <div class="hero-actions">
+        <a href="login.html" class="btn-lime-lg">Start streaming free →</a>
+        <button class="btn-watch"><div class="play-circle">▶</div>Watch demo</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">100%</div><div class="stat-label">Free forever</div></div>
+        <div><div class="stat-num">0</div><div class="stat-label">Downloads</div></div>
+        <div><div class="stat-num">5+</div><div class="stat-label">Platforms</div></div>
+      </div>
+    </div>
+    <div class="mock-dash">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <span class="mock-url">vitaamain.app/dashboard</span>
+        <div class="mock-platforms">
+          <div class="mock-plat-badge" style="background:rgba(145,70,255,.15);border:1px solid rgba(145,70,255,.3);color:#9146FF">TW</div>
+          <div class="mock-plat-badge" style="background:rgba(255,0,0,.15);border:1px solid rgba(255,0,0,.3);color:#FF0000">YT</div>
+          <div class="mock-plat-badge" style="background:rgba(83,252,24,.15);border:1px solid rgba(83,252,24,.3);color:#53FC18">KK</div>
+        </div>
+      </div>
+      <div class="mock-scenes-sources">
+        <div class="mock-scenes">
+          <div class="mock-section-label">Scenes</div>
+          <div class="mock-scene-item" style="background:rgba(200,255,0,.08);color:#c8ff00;border:1px solid rgba(200,255,0,.15)"><span style="font-size:6px;margin-right:4px">●</span>Gameplay</div>
+          <div class="mock-scene-item" style="color:#282828">Facecam</div>
+          <div class="mock-scene-item" style="color:#282828">BRB</div>
+          <div class="mock-scene-item" style="color:#282828">Outro</div>
+        </div>
+        <div style="padding:10px">
+          <div class="mock-section-label">Sources</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:1px;background:#c8ff00;flex-shrink:0"></div><span style="font-size:9px;color:#333;font-family:monospace">Game Capture</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:1px;background:#00cfff;flex-shrink:0"></div><span style="font-size:9px;color:#333;font-family:monospace">Webcam</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:1px;background:#ff9900;flex-shrink:0"></div><span style="font-size:9px;color:#333;font-family:monospace">Alert Layer</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><div style="width:5px;height:5px;border-radius:1px;background:#9146FF;flex-shrink:0"></div><span style="font-size:9px;color:#333;font-family:monospace">Chat Box</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mock-stats-row">
+        <div class="mock-stat"><div class="mock-stat-num">2,841</div><div class="mock-stat-label">Viewers</div></div>
+        <div class="mock-stat"><div class="mock-stat-num">4.1k</div><div class="mock-stat-label">Followers</div></div>
+        <div class="mock-stat"><div class="mock-stat-num">3.2h</div><div class="mock-stat-label">Uptime</div></div>
+        <div class="mock-stat" style="border-right:none"><div class="mock-stat-num">186</div><div class="mock-stat-label">New Follows</div></div>
+      </div>
+      <div class="mock-alert"><span style="color:#c8ff00">★ xXShadowGamer</span> just subscribed! (3 months) 🎉</div>
+    </div>
+  </div>
+</section>
+
+<div class="ticker-wrap"><div class="ticker-track" id="ticker2"></div></div>
+
+<!-- MULTISTREAM -->
+<section id="multistream" class="section">
+  <div class="two-col">
+    <div>
+      <div class="section-eyebrow">Multi-streaming</div>
+      <h2 class="section-title" style="font-size:clamp(38px,5vw,62px);margin-bottom:20px">STREAM TO<br>EVERY PLATFORM.<br><span style="color:var(--lime)">AT ONCE.</span></h2>
+      <p class="section-sub">Connect Twitch, YouTube, Kick and more — then go live on all of them with one click.</p>
+      <p class="section-sub" style="color:#2a2a2a">Your device sends each stream directly to each platform. No middleman, no extra fees — just your upload bandwidth doing what it's always been capable of.</p>
+      <div class="howit-box">
+        <div class="howit-label">How it works</div>
+        <div class="howit-step"><div class="step-num">1</div><div class="step-text">Connect your platform accounts</div></div>
+        <div class="howit-step"><div class="step-num">2</div><div class="step-text">Select which platforms to stream to</div></div>
+        <div class="howit-step"><div class="step-num">3</div><div class="step-text">Hit go live — your device handles the rest</div></div>
+        <div class="howit-step"><div class="step-num">4</div><div class="step-text">One dashboard for all your chats and alerts</div></div>
+      </div>
+      <a href="login.html" class="btn-lime-lg" style="font-size:11px;padding:12px 26px">Try it free →</a>
+    </div>
+
+    <!-- Interactive diagram -->
+    <div class="ms-diagram">
+      <div class="mock-bar" style="margin-bottom:22px;border-radius:8px">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <span class="mock-url">vitaamain.app/stream</span>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:5px;background:rgba(255,0,0,.07);border:1px solid rgba(255,51,51,.1);border-radius:4px;padding:2px 8px">
+          <div style="width:5px;height:5px;background:#ff3333;border-radius:50%;animation:pulse 1s infinite"></div>
+          <span style="font-size:9px;color:#ff5555;font-family:monospace;font-weight:700">LIVE</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div class="ms-source">
+          <div class="ms-source-label">Your stream</div>
+          <div class="ms-source-val">1080p · 6000 kbps</div>
+        </div>
+        <div class="ms-connector"></div>
+        <div class="ms-platforms" id="ms-platforms"></div>
+        <div class="ms-alert" id="ms-alert">
+          <div class="ms-alert-icon">⚡</div>
+          <div>
+            <div class="ms-alert-title" id="ms-alert-title">Multi-streaming to X platforms</div>
+            <div class="ms-alert-body" id="ms-alert-body">Your device will send X separate streams using your upload bandwidth.</div>
+          </div>
+        </div>
+        <div class="ms-hint" id="ms-hint">select platforms above to stream to</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="features-section">
+  <div class="features-section-inner">
+    <div class="features-header">
+      <div class="section-eyebrow" style="text-align:center">Everything included</div>
+      <h2 class="section-title" style="font-size:clamp(36px,5vw,58px);text-align:center;margin-bottom:14px">EVERY TOOL YOU NEED.<br><span style="color:var(--lime)">NOTHING YOU DON'T.</span></h2>
+      <p style="font-size:14px;color:#2e2e2e;font-weight:300;max-width:440px;margin:0 auto;text-align:center">A complete professional streaming setup — scenes, audio, filters, overlays, chat and analytics — all free, all in your browser.</p>
+    </div>
+    <div class="features-grid" id="features-grid"></div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section id="platforms" class="platforms-section">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start">
+    <div>
+      <div class="section-eyebrow">Platform support</div>
+      <h2 class="section-title" style="font-size:clamp(36px,5vw,58px);margin-bottom:18px">WHERE DO<br>YOU STREAM?<br><span style="color:var(--lime)">WE'RE THERE.</span></h2>
+      <p class="section-sub" style="max-width:360px">Connect Twitch, YouTube, Kick and more. Partial-support platforms are clearly labelled — you'll always know what works before connecting.</p>
+      <p style="font-size:11px;color:#1e1e1e;font-family:monospace">* Partial support = limited API access on that platform's end.</p>
+    </div>
+    <div class="platforms-list">
+      <div class="plat-row"><div class="plat-name"><div class="plat-dot" style="background:#9146FF"></div>Twitch</div><span class="plat-badge full">Full support</span></div>
+      <div class="plat-row"><div class="plat-name"><div class="plat-dot" style="background:#FF0000"></div>YouTube</div><span class="plat-badge full">Full support</span></div>
+      <div class="plat-row"><div class="plat-name"><div class="plat-dot" style="background:#53FC18"></div>Kick</div><span class="plat-badge partial">Partial</span></div>
+      <div class="plat-row"><div class="plat-name"><div class="plat-dot" style="background:#FF004F"></div>TikTok Live</div><span class="plat-badge partial">Partial</span></div>
+      <div class="plat-row"><div class="plat-name"><div class="plat-dot" style="background:#1877F2"></div>Facebook Gaming</div><span class="plat-badge partial">Partial</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-glow"></div>
+  <h2 class="cta-title">READY TO<br><span>GO LIVE?</span></h2>
+  <p class="cta-sub">Free forever. No credit card. No download. Just open and stream.</p>
+  <a href="login.html" class="btn-lime-lg" style="font-size:14px;padding:18px 44px">Create your free account →</a>
+</section>
+
+<footer>
+  <a href="index.html" class="logo" style="font-size:18px"><div class="logo-dot"></div>VitaaMain</a>
+  <span class="footer-copy">FREE FOREVER · BROWSER BASED · NO DOWNLOAD</span>
+  <span class="footer-copy">© 2025 VITAAMAIN</span>
+</footer>
+
+<script>
+// Ticker
+const TICKER_ITEMS = ["Multi-streaming","Scene manager","Audio mixer","Chroma key","Alert system","Live analytics","Chat moderation","Overlay builder","Studio mode","Noise suppression","Goal widgets","Free forever","No download","Twitch","YouTube","Kick"];
+function buildTicker(id) {
+  const el = document.getElementById(id);
+  const items = [...TICKER_ITEMS,...TICKER_ITEMS,...TICKER_ITEMS];
+  el.innerHTML = items.map((t,i)=>`<span class="ticker-item">${["◆","▸","◇"][i%3]} ${t}</span>`).join("");
+}
+buildTicker("ticker"); buildTicker("ticker2");
+
+// Nav scroll
+window.addEventListener("scroll",()=>{
+  document.getElementById("nav").classList.toggle("scrolled",window.scrollY>40);
+});
+
+// Features
+const FEATURES=[
+  {icon:"▶",label:"Multi-streaming",color:"#c8ff00"},
+  {icon:"⬡",label:"Scene Manager",color:"#00cfff"},
+  {icon:"♫",label:"Audio Mixer",color:"#ff9900"},
+  {icon:"◈",label:"Overlay Builder",color:"#b96cff"},
+  {icon:"◎",label:"Chroma Key",color:"#ff4444"},
+  {icon:"◐",label:"Unified Chat",color:"#00e5a0"},
+  {icon:"◉",label:"Analytics",color:"#c8ff00"},
+  {icon:"⚡",label:"Alert System",color:"#ff9900"},
+  {icon:"⊕",label:"Noise Suppression",color:"#ff4444"},
+  {icon:"⬛",label:"Moderation Tools",color:"#00cfff"},
+  {icon:"◻",label:"Goal Widgets",color:"#b96cff"},
+  {icon:"⊞",label:"LUT Filters",color:"#00e5a0"},
+];
+document.getElementById("features-grid").innerHTML = FEATURES.map(f=>`
+  <div class="feature-pill">
+    <span class="feature-pill-icon" style="color:${f.color}">${f.icon}</span>
+    <span class="feature-pill-label">${f.label}</span>
+  </div>`).join("");
+
+// Multistream diagram
+const PLATS=[
+  {id:"twitch",  name:"Twitch",         short:"TW",color:"#9146FF"},
+  {id:"youtube", name:"YouTube",        short:"YT",color:"#FF0000"},
+  {id:"kick",    name:"Kick",           short:"KK",color:"#53FC18"},
+  {id:"tiktok",  name:"TikTok",         short:"TT",color:"#FF004F"},
+  {id:"facebook",name:"Facebook",       short:"FB",color:"#1877F2"},
+];
+
+let activePlats = new Set([0,1]);
+
+function renderPlatforms() {
+  const wrap = document.getElementById("ms-platforms");
+  wrap.innerHTML = PLATS.map((p,i)=>`
+    <button class="ms-plat-btn${activePlats.has(i)?" active":""}" onclick="togglePlat(${i})"
+      style="${activePlats.has(i)?`border-color:${p.color}55;background:${p.color}12;box-shadow:0 0 18px ${p.color}12`:""}">
+      <div class="ms-plat-icon" style="${activePlats.has(i)?`background:${p.color};color:#fff`:""}">
+        ${p.short}
+      </div>
+      <span class="ms-plat-name" style="color:${activePlats.has(i)?p.color:"#2a2a2a"}">${p.name}</span>
+      <div class="ms-plat-dot" style="background:${activePlats.has(i)?p.color:"#1c1c1c"};${activePlats.has(i)?"animation:pulse 1.5s infinite":""}"></div>
+    </button>`).join("");
+  updateAlert();
+}
+
+function togglePlat(i) {
+  if(activePlats.has(i)) activePlats.delete(i); else activePlats.add(i);
+  renderPlatforms();
+}
+
+function updateAlert() {
+  const n = activePlats.size;
+  const alertEl = document.getElementById("ms-alert");
+  const hintEl = document.getElementById("ms-hint");
+  const titleEl = document.getElementById("ms-alert-title");
+  const bodyEl = document.getElementById("ms-alert-body");
+  if(n > 1) {
+    alertEl.classList.add("visible");
+    hintEl.style.display = "none";
+    titleEl.textContent = `Multi-streaming to ${n} platforms`;
+    bodyEl.textContent = `Your device will send ${n} separate streams using your upload bandwidth. ~${n*6}Mbps recommended.`;
+  } else {
+    alertEl.classList.remove("visible");
+    hintEl.style.display = "block";
+    hintEl.textContent = n === 0 ? "select platforms above to stream to" : "select more platforms to multi-stream";
+  }
+}
+
+renderPlatforms();
+</script>
+</body>
+</html>

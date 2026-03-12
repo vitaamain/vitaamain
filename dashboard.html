@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VitaaMain — Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:#080808;color:#e8e8e0;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column}
+:root{--lime:#c8ff00;--border:#141414;--border2:#1c1c1c;--bg2:#0a0a0a;--bg3:#0d0d0d}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes popIn{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes liveGlow{0%,100%{box-shadow:0 0 6px rgba(255,51,51,.08)}50%{box-shadow:0 0 20px rgba(255,51,51,.28)}}
+@keyframes overlayIn{from{opacity:0}to{opacity:1}}
+
+/* ── TOPBAR ── */
+.topbar{background:#060606;border-bottom:1px solid var(--border);padding:0 16px;height:50px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;gap:10px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.12em;color:#fff;display:flex;align-items:center;gap:8px;text-decoration:none}
+.logo-dot{width:7px;height:7px;background:var(--lime);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+.topbar-center{display:flex;align-items:center;gap:7px;flex:1;justify-content:center}
+.topbar-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+
+.tb-btn{display:flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--border2);border-radius:6px;padding:6px 12px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;color:#3a3a3a;transition:all .15s;white-space:nowrap}
+.tb-btn:hover{border-color:#2e2e2e;color:#666;background:rgba(255,255,255,.02)}
+
+.plat-chip{height:24px;padding:0 8px;border-radius:4px;border:1px solid transparent;display:flex;align-items:center;gap:5px;font-size:9px;font-weight:800;font-family:monospace;letter-spacing:.04em}
+.plat-chip-dot{width:5px;height:5px;border-radius:50%;animation:pulse 1.5s infinite}
+
+.multi-badge{display:none;align-items:center;gap:5px;background:#141000;border:1px solid rgba(200,255,0,.15);border-radius:5px;padding:3px 9px}
+.multi-badge.show{display:flex}
+.multi-badge span{font-size:10px;color:var(--lime);font-family:monospace;font-weight:700}
+
+.go-live-btn{background:var(--lime);color:#080808;font-weight:800;font-size:11px;padding:8px 18px;border-radius:6px;border:none;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap}
+.go-live-btn:hover:not(:disabled){background:#d6ff2a;transform:translateY(-1px);box-shadow:0 4px 18px rgba(200,255,0,.22)}
+.go-live-btn:disabled{background:#1a1a1a;color:#2a2a2a;cursor:not-allowed}
+
+.live-ind{display:none;align-items:center;gap:6px;background:rgba(255,0,0,.05);border:1px solid rgba(255,51,51,.15);border-radius:6px;padding:5px 11px;animation:liveGlow 2s ease-in-out infinite}
+.live-ind.show{display:flex}
+.live-dot{width:6px;height:6px;background:#ff3333;border-radius:50%;animation:pulse 1s infinite;flex-shrink:0}
+.live-text{font-size:11px;color:#ff5555;font-family:monospace;font-weight:700}
+.live-timer{font-size:11px;color:#2a2a2a;font-family:monospace;margin-left:2px}
+
+.logout-btn{background:none;border:1px solid var(--border2);border-radius:5px;color:#222;font-size:10px;cursor:pointer;padding:5px 10px;font-family:monospace;letter-spacing:.06em;text-decoration:none;transition:all .15s}
+.logout-btn:hover{border-color:#333;color:#555}
+
+/* ── LAYOUT ── */
+.layout{flex:1;display:grid;grid-template-columns:190px 1fr 240px;overflow:hidden;min-height:0}
+
+/* ── LEFT ── */
+.sb-left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;min-height:0}
+.sb-sec{padding:11px}
+.sb-sec+.sb-sec{border-top:1px solid var(--border)}
+.sb-lbl{font-size:8px;color:#222;font-family:monospace;letter-spacing:.13em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.sb-lbl button{background:none;border:none;color:rgba(200,255,0,.4);font-size:10px;cursor:pointer;font-family:monospace;padding:0;transition:color .15s}
+.sb-lbl button:hover{color:var(--lime)}
+
+.scene-btn{width:100%;text-align:left;padding:7px 9px;border-radius:5px;margin-bottom:3px;font-size:11px;font-family:monospace;border:1px solid transparent;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:7px;background:transparent;color:#282828}
+.scene-btn:hover{color:#555;background:rgba(255,255,255,.02)}
+.scene-btn.active{background:rgba(200,255,0,.07);color:var(--lime);border-color:rgba(200,255,0,.12)}
+.scene-live-dot{width:5px;height:5px;border-radius:50%;background:var(--lime);flex-shrink:0;animation:pulse 1.5s infinite}
+
+.src-row{display:flex;align-items:center;gap:7px;margin-bottom:6px;cursor:pointer;transition:opacity .2s;user-select:none;padding:3px 0}
+.src-row.off{opacity:.28}
+.src-color{width:6px;height:6px;border-radius:1px;flex-shrink:0}
+.src-name{font-size:10px;color:#3a3a3a;font-family:monospace;flex:1}
+
+.empty-st{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 10px;text-align:center;gap:7px}
+.empty-icon{font-size:20px;opacity:.14}
+.empty-txt{font-size:10px;color:#1a1a1a;font-family:monospace;line-height:1.6}
+.empty-action{background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.12);border-radius:5px;color:var(--lime);font-size:10px;font-family:monospace;font-weight:700;padding:6px 12px;cursor:pointer;transition:all .15s;margin-top:4px}
+.empty-action:hover{background:rgba(200,255,0,.1)}
+
+.audio-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.audio-lbl{font-size:9px;color:#2a2a2a;font-family:monospace;width:72px;flex-shrink:0}
+input[type=range]{flex:1;-webkit-appearance:none;appearance:none;height:3px;border-radius:2px;background:#1a1a1a;cursor:pointer;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--lime);cursor:pointer}
+.audio-val{font-size:9px;color:#222;font-family:monospace;width:28px;text-align:right}
+
+/* ── CENTRE ── */
+.centre{display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.pre-live{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 40px;animation:fadeUp .5s ease both}
+.pre-live-icon{font-size:36px;opacity:.06;margin-bottom:20px}
+.pre-live-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:#1c1c1c;margin-bottom:10px}
+.pre-live-sub{font-size:13px;color:#181818;font-weight:300;text-align:center;max-width:340px;line-height:1.75;margin-bottom:28px}
+.checklist{display:flex;flex-direction:column;gap:9px;margin-bottom:32px;width:100%;max-width:300px}
+.check-row{display:flex;align-items:center;gap:10px;font-size:12px;font-family:monospace}
+.check-icon{width:18px;height:18px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .25s}
+.check-icon.done{background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.22);color:var(--lime)}
+.check-icon.todo{background:#0d0d0d;border:1px solid #1c1c1c;color:#1e1e1e}
+.check-label.done{color:#3a3a3a}
+.check-label.todo{color:#1a1a1a}
+
+.live-view{display:none;flex-direction:column;flex:1;overflow:hidden;min-height:0}
+.live-view.show{display:flex}
+
+.preview-area{background:#0a0a0a;border-bottom:1px solid var(--border);position:relative;flex-shrink:0;height:192px;display:flex;align-items:flex-end;padding:12px;overflow:hidden}
+.preview-bg{position:absolute;inset:0;background:linear-gradient(135deg,#08080f 0%,#0d1520 50%,#080f08 100%)}
+.preview-scene-tag{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.82);border-radius:4px;padding:3px 9px;font-size:10px;color:var(--lime);font-family:monospace;font-weight:700;z-index:1}
+.preview-plat-row{position:absolute;top:10px;right:10px;display:flex;gap:4px;z-index:1}
+.preview-plat-pin{height:18px;padding:0 7px;border-radius:3px;display:flex;align-items:center;gap:4px;font-size:7px;font-family:monospace;font-weight:800}
+.preview-alert{position:relative;z-index:1;background:rgba(0,0,0,.88);border-left:2px solid var(--lime);border-radius:5px;padding:7px 12px;font-size:11px;color:#666;font-family:monospace;max-width:380px;display:none}
+.preview-alert.show{display:block;animation:slideIn .4s ease}
+
+.stats-row{display:grid;border-bottom:1px solid var(--border);flex-shrink:0}
+.stat-cell{padding:10px 8px;border-right:1px solid var(--border);text-align:center}
+.stat-cell:last-child{border-right:none}
+.stat-big{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--lime)}
+.stat-lbl{font-size:7px;color:#222;font-family:monospace;letter-spacing:.07em;text-transform:uppercase;margin-top:2px}
+
+.alerts-sec{padding:10px 13px;border-bottom:1px solid var(--border);flex-shrink:0}
+.alert-item{background:var(--bg3);border-left:2px solid var(--border2);border-radius:4px;padding:5px 10px;font-size:11px;color:#2a2a2a;font-family:monospace;margin-bottom:5px}
+.alert-item.fresh{border-left-color:var(--lime);color:#666;animation:slideIn .4s ease}
+.alert-star{color:#2a2a2a}
+.alert-item.fresh .alert-star{color:var(--lime)}
+
+.breakdown-sec{padding:10px 13px;flex:1;overflow-y:auto}
+.bd-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bd-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.bd-name{font-size:11px;color:#2a2a2a;font-family:monospace;width:70px;flex-shrink:0}
+.bd-bar-bg{flex:1;height:3px;background:#111;border-radius:2px;overflow:hidden}
+.bd-bar{height:100%;border-radius:2px;transition:width .6s ease}
+.bd-count{font-size:10px;color:#1e1e1e;font-family:monospace;width:78px;text-align:right;white-space:nowrap}
+
+/* ── CHAT ── */
+.sb-right{border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.chat-head{padding:10px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.chat-body{flex:1;padding:10px 11px;overflow-y:auto;display:flex;flex-direction:column;gap:7px}
+.chat-msg{font-size:11px;font-family:monospace;display:flex;align-items:flex-start;gap:6px;animation:slideIn .3s ease}
+.chat-badge{height:14px;padding:0 4px;border-radius:2px;display:flex;align-items:center;font-size:6px;font-weight:800;flex-shrink:0;margin-top:1px}
+.chat-user{color:#333}
+.chat-text{color:#555}
+.chat-offline{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:20px}
+.chat-offline-icon{font-size:20px;opacity:.08}
+.chat-offline-txt{font-size:10px;color:#181818;font-family:monospace;text-align:center;line-height:1.7}
+.chat-input-row{padding:9px 11px;border-top:1px solid var(--border);flex-shrink:0;display:flex;gap:6px}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:8px 10px;color:#666;font-size:11px;font-family:monospace;outline:none;transition:border-color .2s}
+.chat-input:focus{border-color:rgba(200,255,0,.2)}
+.chat-input::placeholder{color:#181818}
+.chat-input:disabled{opacity:.22;cursor:default}
+.chat-send{background:var(--lime);color:#080808;border:none;border-radius:6px;padding:0 12px;font-weight:800;font-size:11px;cursor:pointer;font-family:monospace;transition:all .15s}
+.chat-send:hover:not(:disabled){background:#d6ff2a}
+.chat-send:disabled{background:#1a1a1a;color:#2a2a2a;cursor:default}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);backdrop-filter:blur(8px);z-index:200;display:flex;align-items:center;justify-content:center;animation:overlayIn .2s ease;padding:20px}
+.modal-overlay.hidden{display:none}
+.modal{background:#0a0a0a;border:1px solid #1e1e1e;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;animation:popIn .25s cubic-bezier(.16,1,.3,1) both;box-shadow:0 40px 100px rgba(0,0,0,.95)}
+.modal-head{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#0a0a0a;z-index:1}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:#fff}
+.modal-close{background:none;border:1px solid var(--border2);border-radius:5px;color:#333;font-size:13px;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.modal-close:hover{border-color:#444;color:#888}
+.modal-body{padding:18px 22px 24px;display:flex;flex-direction:column;gap:10px}
+.modal-sub{font-size:13px;color:#2a2a2a;font-weight:300;line-height:1.65;margin-bottom:4px}
+
+/* Services */
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:13px 15px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;transition:border-color .2s}
+.svc-row.connected{border-color:rgba(200,255,0,.18)}
+.svc-left{display:flex;align-items:center;gap:12px}
+.svc-logo{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.svc-name{font-size:14px;font-weight:700;color:#bbb;margin-bottom:2px}
+.svc-status{font-size:10px;font-family:monospace}
+.svc-status.ok{color:var(--lime)}
+.svc-status.partial-color{color:#ff9900}
+.svc-status.off{color:#222}
+.conn-btn{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:7px 14px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;color:#333;transition:all .15s;white-space:nowrap}
+.conn-btn:hover:not(:disabled){border-color:#333;color:#777}
+.conn-btn.on{background:rgba(200,255,0,.07);border-color:rgba(200,255,0,.22);color:var(--lime)}
+.conn-btn.on:hover{background:rgba(255,68,68,.05);border-color:rgba(255,68,68,.25);color:#ff6060}
+.conn-btn:disabled{opacity:.4;cursor:default}
+.limit-note{font-size:10px;color:#1e1e1e;font-family:monospace;padding:8px 12px;background:var(--bg3);border-radius:6px;border-left:2px solid rgba(255,153,0,.22);line-height:1.65;display:none;animation:fadeUp .2s ease both}
+.limit-toggle{background:none;border:none;color:#ff9900;font-size:10px;font-family:monospace;cursor:pointer;padding:0;text-decoration:underline;text-decoration-color:rgba(255,153,0,.3)}
+.limit-toggle:hover{text-decoration-color:#ff9900}
+
+/* Sources */
+.src-modal-row{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:9px;transition:all .15s;flex-direction:column;gap:0;align-items:stretch}
+.src-modal-row.added{border-color:rgba(200,255,0,.14)}
+.src-modal-top{display:flex;align-items:center;justify-content:space-between}
+.src-modal-left{display:flex;align-items:center;gap:11px}
+.src-modal-icon{width:32px;height:32px;border-radius:7px;background:#111;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.src-modal-name{font-size:13px;font-weight:600;color:#777;margin-bottom:1px}
+.src-modal-desc{font-size:10px;color:#222;font-weight:300}
+.src-add-btn{background:transparent;border:1px solid var(--border2);border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;color:#2a2a2a;transition:all .15s;white-space:nowrap}
+.src-add-btn:hover:not(.added){border-color:#333;color:#666}
+.src-add-btn.added{background:rgba(200,255,0,.06);border-color:rgba(200,255,0,.18);color:var(--lime)}
+.src-add-btn.added:hover{background:rgba(255,68,68,.05);border-color:rgba(255,68,68,.2);color:#ff6060}
+
+/* Device picker (expands inside source row) */
+.device-picker{margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:none;flex-direction:column;gap:6px}
+.device-picker.show{display:flex}
+.device-picker-label{font-size:9px;color:#222;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
+.device-select{width:100%;background:#060606;border:1px solid var(--border2);border-radius:6px;padding:7px 10px;color:#888;font-size:11px;font-family:monospace;outline:none;cursor:pointer;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+.device-select:focus{border-color:rgba(200,255,0,.2)}
+.device-select option{background:#0a0a0a;color:#888}
+.device-loading{font-size:10px;color:#1e1e1e;font-family:monospace;font-style:italic}
+.device-permission-btn{background:rgba(200,255,0,.06);border:1px solid rgba(200,255,0,.14);border-radius:5px;color:var(--lime);font-size:10px;font-family:monospace;font-weight:700;padding:6px 12px;cursor:pointer;transition:all .15s;width:fit-content}
+.device-permission-btn:hover{background:rgba(200,255,0,.1)}
+
+.spinner{width:11px;height:11px;border:2px solid #333;border-top-color:var(--lime);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:#060606}
+::-webkit-scrollbar-thumb{background:#181818;border-radius:2px}
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<div class="topbar">
+  <a href="index.html" class="logo"><div class="logo-dot"></div>VitaaMain</a>
+  <div class="topbar-center">
+    <div id="plat-chips"></div>
+    <div class="multi-badge" id="multi-badge"><span>⚡</span><span id="multi-txt">Multi-streaming</span></div>
+  </div>
+  <div class="topbar-right">
+    <button class="tb-btn" onclick="openModal('src-modal')">＋ Add sources</button>
+    <button class="tb-btn" onclick="openModal('svc-modal')">⊕ Add stream services</button>
+    <div class="live-ind" id="live-ind">
+      <div class="live-dot"></div>
+      <span class="live-text">LIVE</span>
+      <span class="live-timer" id="live-timer">00:00:00</span>
+    </div>
+    <button class="go-live-btn" id="go-live-btn" onclick="toggleLive()" disabled>
+      <div style="width:6px;height:6px;background:#080808;border-radius:50%"></div>Go Live
+    </button>
+    <a href="login.html" class="logout-btn">OUT</a>
+  </div>
+</div>
+
+<!-- ═══ LAYOUT ═══ -->
+<div class="layout">
+  <!-- LEFT -->
+  <div class="sb-left">
+    <div class="sb-sec">
+      <div class="sb-lbl">Scenes <button onclick="addScene()">＋ add</button></div>
+      <div id="scenes-list"></div>
+    </div>
+    <div class="sb-sec" style="flex:1">
+      <div class="sb-lbl">Sources <button onclick="openModal('src-modal')">＋ add</button></div>
+      <div id="sources-sidebar"></div>
+    </div>
+    <div class="sb-sec">
+      <div class="sb-lbl">Audio mixer</div>
+      <div class="audio-row"><span class="audio-lbl">Microphone</span><input type="range" min="0" max="100" value="80" oninput="this.nextElementSibling.textContent=this.value+'%'"/><span class="audio-val">80%</span></div>
+      <div class="audio-row"><span class="audio-lbl">Desktop</span><input type="range" min="0" max="100" value="65" oninput="this.nextElementSibling.textContent=this.value+'%'"/><span class="audio-val">65%</span></div>
+      <div class="audio-row"><span class="audio-lbl">Game Audio</span><input type="range" min="0" max="100" value="90" oninput="this.nextElementSibling.textContent=this.value+'%'"/><span class="audio-val">90%</span></div>
+      <div class="audio-row"><span class="audio-lbl">Alert SFX</span><input type="range" min="0" max="100" value="50" oninput="this.nextElementSibling.textContent=this.value+'%'"/><span class="audio-val">50%</span></div>
+    </div>
+  </div>
+
+  <!-- CENTRE -->
+  <div class="centre">
+    <div class="pre-live" id="pre-live">
+      <div class="pre-live-icon">▶</div>
+      <div class="pre-live-title">Ready to go live?</div>
+      <div class="pre-live-sub">Connect your streaming platforms and add your sources, then hit Go Live.</div>
+      <div class="checklist" id="checklist"></div>
+      <button class="go-live-btn" id="go-live-centre" onclick="toggleLive()" disabled style="font-size:13px;padding:13px 32px">
+        <div style="width:7px;height:7px;background:#080808;border-radius:50%"></div>Go Live
+      </button>
+    </div>
+
+    <div class="live-view" id="live-view">
+      <div class="preview-area">
+        <div class="preview-bg"></div>
+        <div class="preview-scene-tag" id="preview-scene-tag">Scene</div>
+        <div class="preview-plat-row" id="preview-plat-row"></div>
+        <div class="preview-alert" id="preview-alert"></div>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="alerts-sec">
+        <div class="sb-lbl" style="margin-bottom:8px">Recent alerts</div>
+        <div id="alerts-list"><div style="font-size:10px;color:#181818;font-family:monospace">Waiting for activity...</div></div>
+      </div>
+      <div class="breakdown-sec">
+        <div class="sb-lbl" style="margin-bottom:10px">Platform breakdown</div>
+        <div id="breakdown"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="sb-right">
+    <div class="chat-head">
+      <div class="sb-lbl" style="margin-bottom:0">Live chat</div>
+      <div id="chat-plat-dots" style="display:flex;gap:4px"></div>
+    </div>
+    <div class="chat-body" id="chat-body">
+      <div class="chat-offline">
+        <div class="chat-offline-icon">💬</div>
+        <div class="chat-offline-txt">Chat will appear here<br>once you go live</div>
+      </div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="Go live to chat..." disabled/>
+      <button class="chat-send" id="chat-send" onclick="sendChat()" disabled>→</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     STREAM SERVICES MODAL
+═══════════════════════════════ -->
+<div class="modal-overlay hidden" id="svc-modal" onclick="bgClose(event,'svc-modal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Stream Services</div>
+      <button class="modal-close" onclick="closeModal('svc-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub">Connect the platforms you want to stream to. Each connected platform receives its own independent stream from your device.</p>
+
+      <!-- Twitch -->
+      <div class="svc-row" id="svc-twitch">
+        <div class="svc-left">
+          <div class="svc-logo"><?xml version="1.0"?>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#c8ff00" d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/></svg>
+          </div>
+          <div><div class="svc-name">Twitch</div><div class="svc-status off" id="st-twitch">Not connected</div></div>
+        </div>
+        <button class="conn-btn" id="cb-twitch" onclick="toggleSvc('twitch')">Connect</button>
+      </div>
+
+      <!-- YouTube -->
+      <div class="svc-row" id="svc-youtube">
+        <div class="svc-left">
+          <div class="svc-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#c8ff00" d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+          </div>
+          <div><div class="svc-name">YouTube</div><div class="svc-status off" id="st-youtube">Not connected</div></div>
+        </div>
+        <button class="conn-btn" id="cb-youtube" onclick="toggleSvc('youtube')">Connect</button>
+      </div>
+
+      <!-- Kick -->
+      <div class="svc-row" id="svc-kick">
+        <div class="svc-left">
+          <div class="svc-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#c8ff00" d="M13.752 0H2v24h9.248v-7.504L8.496 24H18.32l-6.072-8.496L18.128 7.5H8.496l2.752 4.504V0z"/></svg>
+          </div>
+          <div>
+            <div class="svc-name">Kick</div>
+            <div class="svc-status partial-color" id="st-kick">Partial — <button class="limit-toggle" onclick="toggleNote('kick-note')">see limitations</button></div>
+          </div>
+        </div>
+        <button class="conn-btn" id="cb-kick" onclick="toggleSvc('kick')">Connect</button>
+      </div>
+      <div class="limit-note" id="kick-note">⚠ Analytics unavailable due to Kick API restrictions.</div>
+
+      <!-- TikTok -->
+      <div class="svc-row" id="svc-tiktok">
+        <div class="svc-left">
+          <div class="svc-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#c8ff00" d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.35a8.16 8.16 0 0 0 4.77 1.52V7.42a4.85 4.85 0 0 1-1-.73z"/></svg>
+          </div>
+          <div>
+            <div class="svc-name">TikTok Live</div>
+            <div class="svc-status partial-color" id="st-tiktok">Partial — <button class="limit-toggle" onclick="toggleNote('tiktok-note')">see limitations</button></div>
+          </div>
+        </div>
+        <button class="conn-btn" id="cb-tiktok" onclick="toggleSvc('tiktok')">Connect</button>
+      </div>
+      <div class="limit-note" id="tiktok-note">⚠ Follower alerts only. Chat is read-only. No analytics.</div>
+
+      <!-- Facebook -->
+      <div class="svc-row" id="svc-facebook">
+        <div class="svc-left">
+          <div class="svc-logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28"><path fill="#c8ff00" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </div>
+          <div>
+            <div class="svc-name">Facebook Gaming</div>
+            <div class="svc-status partial-color" id="st-facebook">Partial — <button class="limit-toggle" onclick="toggleNote('facebook-note')">see limitations</button></div>
+          </div>
+        </div>
+        <button class="conn-btn" id="cb-facebook" onclick="toggleSvc('facebook')">Connect</button>
+      </div>
+      <div class="limit-note" id="facebook-note">⚠ No donation alerts. Analytics delayed up to 24 hours.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════
+     ADD SOURCES MODAL
+═══════════════════════════════ -->
+<div class="modal-overlay hidden" id="src-modal" onclick="bgClose(event,'src-modal')">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Add Sources</div>
+      <button class="modal-close" onclick="closeModal('src-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-sub">Add sources to build your stream layout. Sources that require a device will let you pick from your connected hardware.</p>
+      <div id="src-modal-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+
+const SVCS = {
+  twitch:   { name:"Twitch",          short:"TW", color:"#c8ff00", connected:false },
+  youtube:  { name:"YouTube",         short:"YT", color:"#c8ff00", connected:false },
+  kick:     { name:"Kick",            short:"KK", color:"#c8ff00", connected:false },
+  tiktok:   { name:"TikTok Live",     short:"TT", color:"#c8ff00", connected:false },
+  facebook: { name:"Facebook Gaming", short:"FB", color:"#c8ff00", connected:false },
+};
+
+const SRC_TYPES = [
+  { id:"webcam",  icon:"📷", name:"Webcam",         desc:"Your camera feed",              color:"#00cfff", needsDevice:"videoinput"  },
+  { id:"mic",     icon:"🎙", name:"Microphone",     desc:"Dedicated audio input source",  color:"#ff9900", needsDevice:"audioinput"  },
+  { id:"screen",  icon:"🖥",  name:"Screen Capture", desc:"Capture your entire screen",    color:"#c8ff00", needsDevice:null          },
+  { id:"window",  icon:"⬜", name:"Window Capture", desc:"Capture a specific app window", color:"#ff9900", needsDevice:null          },
+  { id:"game",    icon:"🎮", name:"Game Capture",   desc:"Optimised for games",           color:"#c8ff00", needsDevice:null          },
+  { id:"image",   icon:"🖼",  name:"Image",          desc:"Static image or logo",          color:"#b96cff", needsDevice:null          },
+  { id:"text",    icon:"T",  name:"Text",           desc:"Custom text overlay",           color:"#ff9900", needsDevice:null          },
+  { id:"browser", icon:"🌐", name:"Browser Source", desc:"Any web URL as a source",       color:"#00e5a0", needsDevice:null          },
+  { id:"media",   icon:"🎬", name:"Media File",     desc:"Play a video or audio file",    color:"#ff4444", needsDevice:null          },
+  { id:"alert",   icon:"⚡", name:"Alert Overlay",  desc:"Follow / sub / donation alerts",color:"#c8ff00", needsDevice:null          },
+  { id:"chatbox", icon:"💬", name:"Chat Box",       desc:"Display live chat on stream",   color:"#9146FF", needsDevice:null          },
+];
+
+const SCENES = ["Gameplay","Just Chatting","BRB Screen","Starting Soon","Outro"];
+
+let activeScene = 0;
+let addedSrcs = new Set();          // source ids that are added
+let srcOnOff = {};                  // source id → boolean (on/off)
+let selectedDevices = {};           // source id → { deviceId, label }
+let isLive = false;
+let liveSecs = 0;
+let liveTimer = null;
+let viewerCounts = {};
+let alertsList = [];
+
+// Cached device lists from MediaDevices API
+let cachedVideoDevices = null;
+let cachedAudioDevices = null;
+
+// ════════════════════════════════════════════════════
+// DEVICE ENUMERATION (real browser API)
+// ════════════════════════════════════════════════════
+
+async function getDevices(kind) {
+  // Request permission first if we haven't yet (browsers hide labels without it)
+  try {
+    const constraints = kind === "videoinput"
+      ? { video: true }
+      : { audio: true };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    // Stop all tracks immediately — we just needed the permission grant
+    stream.getTracks().forEach(t => t.stop());
+  } catch (e) {
+    // Permission denied or no device — fall through, enumeration will show empty labels
+  }
+
+  const all = await navigator.mediaDevices.enumerateDevices();
+  return all.filter(d => d.kind === kind);
+}
+
+async function loadVideoDevices() {
+  if (cachedVideoDevices) return cachedVideoDevices;
+  cachedVideoDevices = await getDevices("videoinput");
+  return cachedVideoDevices;
+}
+
+async function loadAudioDevices() {
+  if (cachedAudioDevices) return cachedAudioDevices;
+  cachedAudioDevices = await getDevices("audioinput");
+  return cachedAudioDevices;
+}
+
+// ════════════════════════════════════════════════════
+// SCENES
+// ════════════════════════════════════════════════════
+
+function renderScenes() {
+  document.getElementById("scenes-list").innerHTML = SCENES.map((s,i) => `
+    <button class="scene-btn${i===activeScene?" active":""}" onclick="setScene(${i})">
+      ${i===activeScene?'<div class="scene-live-dot"></div>':''}${s}
+    </button>`).join("");
+  const tag = document.getElementById("preview-scene-tag");
+  if (tag) tag.textContent = SCENES[activeScene];
+}
+
+function setScene(i) { activeScene=i; renderScenes(); }
+
+function addScene() {
+  const n = prompt("Scene name:");
+  if (n && n.trim()) { SCENES.push(n.trim()); renderScenes(); }
+}
+
+// ════════════════════════════════════════════════════
+// SOURCES — sidebar
+// ════════════════════════════════════════════════════
+
+function renderSourcesSidebar() {
+  const wrap = document.getElementById("sources-sidebar");
+  if (!addedSrcs.size) {
+    wrap.innerHTML = `<div class="empty-st">
+      <div class="empty-icon">⬜</div>
+      <div class="empty-txt">No sources added yet</div>
+      <button class="empty-action" onclick="openModal('src-modal')">＋ Add source</button>
+    </div>`;
+    return;
+  }
+  wrap.innerHTML = [...addedSrcs].map(id => {
+    const s = SRC_TYPES.find(x=>x.id===id);
+    const on = srcOnOff[id] !== false;
+    return `<div class="src-row${on?"":" off"}" onclick="toggleSrcOnOff('${id}')">
+      <div class="src-color" style="background:${on?s.color:"#2a2a2a"}"></div>
+      <span class="src-name">${s.name}</span>
+      <span style="font-size:10px">${s.icon}</span>
+    </div>`;
+  }).join("");
+}
+
+function toggleSrcOnOff(id) {
+  srcOnOff[id] = srcOnOff[id] === false;
+  renderSourcesSidebar();
+}
+
+// ════════════════════════════════════════════════════
+// SOURCES — modal with real device picker
+// ════════════════════════════════════════════════════
+
+function renderSourcesModal() {
+  document.getElementById("src-modal-list").innerHTML = SRC_TYPES.map(s => {
+    const added = addedSrcs.has(s.id);
+    const hasDevice = !!s.needsDevice;
+    return `<div class="src-modal-row${added?" added":""}" id="srcrow-${s.id}">
+      <div class="src-modal-top">
+        <div class="src-modal-left">
+          <div class="src-modal-icon">${s.icon}</div>
+          <div>
+            <div class="src-modal-name">${s.name}</div>
+            <div class="src-modal-desc">${s.desc}</div>
+          </div>
+        </div>
+        <button class="src-add-btn${added?" added":""}" onclick="toggleSrc('${s.id}')" id="srcbtn-${s.id}">
+          ${added?"Remove":"＋ Add"}
+        </button>
+      </div>
+      ${hasDevice && added ? `
+        <div class="device-picker show" id="dp-${s.id}">
+          <div class="device-picker-label">${s.needsDevice==="videoinput"?"Camera":"Microphone"}</div>
+          <div id="device-picker-inner-${s.id}">
+            <div class="device-loading"><span class="spinner"></span> Loading devices...</div>
+          </div>
+        </div>` : ""}
+    </div>`;
+  }).join("");
+
+  // Load real devices for any already-added sources that need them
+  SRC_TYPES.filter(s => s.needsDevice && addedSrcs.has(s.id)).forEach(s => {
+    loadDeviceSelectFor(s.id, s.needsDevice);
+  });
+}
+
+async function loadDeviceSelectFor(srcId, kind) {
+  const inner = document.getElementById(`device-picker-inner-${srcId}`);
+  if (!inner) return;
+
+  const devices = kind === "videoinput"
+    ? await loadVideoDevices()
+    : await loadAudioDevices();
+
+  if (!devices || devices.length === 0) {
+    inner.innerHTML = `<div class="device-loading" style="color:#ff6060">
+      No ${kind==="videoinput"?"cameras":"microphones"} found.
+      <button class="device-permission-btn" style="margin-top:6px" onclick="retryDevices('${srcId}','${kind}')">
+        Grant permission
+      </button>
+    </div>`;
+    return;
+  }
+
+  const currentSel = selectedDevices[srcId]?.deviceId || "";
+  inner.innerHTML = `<select class="device-select" onchange="selectDevice('${srcId}', this.value, this.options[this.selectedIndex].text)">
+    ${devices.map(d => {
+      const label = d.label || `${kind==="videoinput"?"Camera":"Microphone"} (${d.deviceId.slice(0,8)}...)`;
+      return `<option value="${d.deviceId}"${d.deviceId===currentSel?" selected":""}>${label}</option>`;
+    }).join("")}
+  </select>`;
+
+  // Auto-select first device if none selected
+  if (!selectedDevices[srcId] && devices.length > 0) {
+    const first = devices[0];
+    selectedDevices[srcId] = { deviceId: first.deviceId, label: first.label || "Default" };
+  }
+}
+
+function selectDevice(srcId, deviceId, label) {
+  selectedDevices[srcId] = { deviceId, label };
+}
+
+async function retryDevices(srcId, kind) {
+  cachedVideoDevices = null;
+  cachedAudioDevices = null;
+  const inner = document.getElementById(`device-picker-inner-${srcId}`);
+  if (inner) inner.innerHTML = `<div class="device-loading"><span class="spinner"></span> Requesting permission...</div>`;
+  await loadDeviceSelectFor(srcId, kind);
+}
+
+async function toggleSrc(id) {
+  const s = SRC_TYPES.find(x=>x.id===id);
+  if (addedSrcs.has(id)) {
+    addedSrcs.delete(id);
+    delete srcOnOff[id];
+    delete selectedDevices[id];
+  } else {
+    addedSrcs.add(id);
+    srcOnOff[id] = true;
+  }
+  renderSourcesModal();
+  renderSourcesSidebar();
+  renderChecklist();
+
+  // If the newly added source needs a device, start loading immediately
+  if (addedSrcs.has(id) && s.needsDevice) {
+    await loadDeviceSelectFor(id, s.needsDevice);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SERVICES
+// ════════════════════════════════════════════════════
+
+function toggleSvc(id) {
+  const svc = SVCS[id];
+  const btn = document.getElementById("cb-"+id);
+  const st  = document.getElementById("st-"+id);
+  const row = document.getElementById("svc-"+id);
+
+  if (svc.connected) {
+    svc.connected = false;
+    btn.textContent="Connect"; btn.classList.remove("on");
+    row.classList.remove("connected");
+    st.className="svc-status off"; st.textContent="Not connected";
+  } else {
+    btn.innerHTML='<span class="spinner"></span>'; btn.disabled=true;
+    setTimeout(() => {
+      svc.connected=true;
+      btn.disabled=false; btn.textContent="Disconnect"; btn.classList.add("on");
+      row.classList.add("connected");
+      st.className="svc-status ok"; st.textContent="Connected ✓";
+      renderPlatChips(); renderChecklist(); updateGoLiveBtn();
+    }, 900);
+    return;
+  }
+  renderPlatChips(); renderChecklist(); updateGoLiveBtn();
+}
+
+function toggleNote(id) {
+  const el = document.getElementById(id);
+  el.style.display = el.style.display==="block" ? "none" : "block";
+}
+
+// ════════════════════════════════════════════════════
+// PLATFORM CHIPS
+// ════════════════════════════════════════════════════
+
+function renderPlatChips() {
+  const conn = Object.entries(SVCS).filter(([,s])=>s.connected);
+  document.getElementById("plat-chips").innerHTML = conn.map(([,s]) => `
+    <div class="plat-chip" style="background:rgba(200,255,0,.1);border-color:rgba(200,255,0,.25);color:var(--lime)">
+      <div class="plat-chip-dot" style="background:var(--lime)"></div>
+      ${s.short}
+    </div>`).join("");
+  const badge = document.getElementById("multi-badge");
+  if (conn.length>1) {
+    badge.classList.add("show");
+    document.getElementById("multi-txt").textContent=`Multi-streaming to ${conn.length} platforms`;
+  } else badge.classList.remove("show");
+}
+
+// ════════════════════════════════════════════════════
+// CHECKLIST
+// ════════════════════════════════════════════════════
+
+function renderChecklist() {
+  const connCount = Object.values(SVCS).filter(s=>s.connected).length;
+  const srcCount  = addedSrcs.size;
+  const items = [
+    { label:`Connect a platform (${connCount} connected)`, done:connCount>0 },
+    { label:`Add a source (${srcCount} added)`,            done:srcCount>0  },
+    { label:"Hit Go Live when you're ready",               done:false        },
+  ];
+  document.getElementById("checklist").innerHTML = items.map(it=>`
+    <div class="check-row">
+      <div class="check-icon ${it.done?"done":"todo"}">${it.done?"✓":"○"}</div>
+      <span class="check-label ${it.done?"done":"todo"}">${it.label}</span>
+    </div>`).join("");
+}
+
+function updateGoLiveBtn() {
+  const can = Object.values(SVCS).some(s=>s.connected);
+  document.getElementById("go-live-btn").disabled    = !can;
+  document.getElementById("go-live-centre").disabled = !can;
+}
+
+// ════════════════════════════════════════════════════
+// GO LIVE / END STREAM
+// ════════════════════════════════════════════════════
+
+function toggleLive() {
+  if (!Object.values(SVCS).some(s=>s.connected)) { openModal("svc-modal"); return; }
+  isLive ? endStream() : startStream();
+}
+
+function startStream() {
+  isLive=true; liveSecs=0; alertsList=[];
+  viewerCounts={};
+  Object.entries(SVCS).filter(([,s])=>s.connected).forEach(([id])=>{
+    viewerCounts[id]=Math.floor(Math.random()*80)+10;
+  });
+
+  document.getElementById("live-ind").classList.add("show");
+  setGoLiveBtnEnd();
+  document.getElementById("pre-live").style.display="none";
+  document.getElementById("live-view").classList.add("show");
+
+  renderPreviewBadges();
+  renderStatsRow();
+  renderBreakdown();
+  renderChatDots();
+
+  document.getElementById("chat-body").innerHTML="";
+  document.getElementById("chat-input").disabled=false;
+  document.getElementById("chat-send").disabled=false;
+  document.getElementById("chat-input").placeholder="Send a message...";
+
+  liveTimer = setInterval(()=>{
+    liveSecs++;
+    const h=String(Math.floor(liveSecs/3600)).padStart(2,"0");
+    const m=String(Math.floor((liveSecs%3600)/60)).padStart(2,"0");
+    const s=String(liveSecs%60).padStart(2,"0");
+    document.getElementById("live-timer").textContent=`${h}:${m}:${s}`;
+    Object.keys(viewerCounts).forEach(id=>{
+      if(Math.random()>.6) viewerCounts[id]+=Math.floor(Math.random()*3)-1;
+      if(viewerCounts[id]<1) viewerCounts[id]=1;
+    });
+    if(liveSecs%10===0){ renderStatsRow(); renderBreakdown(); }
+  }, 1000);
+}
+
+function endStream() {
+  isLive=false;
+  clearInterval(liveTimer); liveTimer=null;
+  document.getElementById("live-ind").classList.remove("show");
+  setGoLiveBtnStart();
+  document.getElementById("live-view").classList.remove("show");
+  document.getElementById("pre-live").style.display="flex";
+  document.getElementById("chat-input").disabled=true;
+  document.getElementById("chat-send").disabled=true;
+  document.getElementById("chat-input").placeholder="Go live to chat...";
+  renderChecklist(); updateGoLiveBtn();
+}
+
+function setGoLiveBtnEnd() {
+  const btn=document.getElementById("go-live-btn");
+  btn.innerHTML='<div style="width:6px;height:6px;background:#ff4444;border-radius:50%"></div>End Stream';
+  btn.style.cssText="background:transparent;color:#ff5555;border:1px solid rgba(255,68,68,.3);font-weight:800;font-size:11px;padding:8px 18px;border-radius:6px;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap";
+}
+function setGoLiveBtnStart() {
+  const btn=document.getElementById("go-live-btn");
+  btn.innerHTML='<div style="width:6px;height:6px;background:#080808;border-radius:50%"></div>Go Live';
+  btn.style.cssText="background:var(--lime);color:#080808;font-weight:800;font-size:11px;padding:8px 18px;border-radius:6px;border:none;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap";
+}
+
+// ════════════════════════════════════════════════════
+// LIVE UI
+// ════════════════════════════════════════════════════
+
+function renderPreviewBadges() {
+  document.getElementById("preview-plat-row").innerHTML=Object.entries(SVCS)
+    .filter(([,s])=>s.connected)
+    .map(([,s])=>`
+      <div class="preview-plat-pin" style="background:rgba(200,255,0,.15);border:1px solid rgba(200,255,0,.3)">
+        <div style="width:4px;height:4px;border-radius:50%;background:var(--lime);animation:pulse 1s infinite"></div>
+        <span style="color:var(--lime)">${s.short}</span>
+      </div>`).join("");
+  const tag=document.getElementById("preview-scene-tag");
+  if(tag) tag.textContent=SCENES[activeScene];
+}
+
+function renderStatsRow() {
+  const total=Object.values(viewerCounts).reduce((a,b)=>a+b,0);
+  const mins=Math.floor(liveSecs/60);
+  const uptime=liveSecs<3600?`${mins}m`:`${Math.floor(liveSecs/3600)}h ${mins%60}m`;
+  const cells=[
+    {v:total.toLocaleString(),               l:"Viewers"},
+    {v:Math.floor(liveSecs/180),             l:"New Follows"},
+    {v:Math.floor(liveSecs/420),             l:"New Subs"},
+    {v:uptime,                               l:"Uptime"},
+    {v:Object.values(SVCS).filter(s=>s.connected).length, l:"Platforms"},
+  ];
+  const row=document.getElementById("stats-row");
+  row.style.gridTemplateColumns=`repeat(${cells.length},1fr)`;
+  row.innerHTML=cells.map(c=>`
+    <div class="stat-cell">
+      <div class="stat-big">${c.v}</div>
+      <div class="stat-lbl">${c.l}</div>
+    </div>`).join("");
+}
+
+function renderBreakdown() {
+  const conn=Object.entries(SVCS).filter(([,s])=>s.connected);
+  if(!conn.length) return;
+  const total=Object.values(viewerCounts).reduce((a,b)=>a+b,0)||1;
+  document.getElementById("breakdown").innerHTML=conn.map(([id,svc])=>{
+    const v=viewerCounts[id]||0;
+    const pct=Math.round(v/total*100);
+    return `<div class="bd-row">
+      <div class="bd-dot" style="background:var(--lime)"></div>
+      <span class="bd-name">${svc.name.split(" ")[0]}</span>
+      <div class="bd-bar-bg"><div class="bd-bar" style="width:${pct}%;background:var(--lime)"></div></div>
+      <span class="bd-count">${v.toLocaleString()} viewers</span>
+    </div>`;
+  }).join("");
+}
+
+function renderChatDots() {
+  document.getElementById("chat-plat-dots").innerHTML=Object.entries(SVCS)
+    .filter(([,s])=>s.connected)
+    .map(()=>`<div style="width:6px;height:6px;border-radius:50%;background:var(--lime)"></div>`).join("");
+}
+
+// ── Alerts — called by real backend (Supabase Realtime) ──────
+// In production, subscribe to supabase realtime stream_alerts table
+// and call this function when a new row arrives.
+function receiveAlert(alert) {
+  const kindMap = {
+    follow:   "just followed!",
+    sub:      "subscribed! 🎉",
+    giftsub:  "gifted a sub 🎁",
+    donation: `donated ${alert.amount || ""} ${alert.currency || ""}`,
+    raid:     `raided with ${alert.viewers || 0} viewers ⚡`,
+  };
+  const text = `${alert.user_name} ${kindMap[alert.kind] || alert.kind}`;
+
+  alertsList.unshift({text, fresh:true});
+  alertsList=alertsList.slice(0,5);
+
+  const alertBox=document.getElementById("preview-alert");
+  alertBox.innerHTML=`<span style="color:var(--lime)">★ </span>${text}`;
+  alertBox.classList.remove("show");
+  void alertBox.offsetWidth;
+  alertBox.classList.add("show");
+
+  renderAlerts();
+  setTimeout(()=>{ if(alertsList[0]) alertsList[0].fresh=false; renderAlerts(); }, 2500);
+}
+
+function renderAlerts() {
+  const wrap=document.getElementById("alerts-list");
+  if(!alertsList.length){
+    wrap.innerHTML=`<div style="font-size:10px;color:#181818;font-family:monospace">Waiting for activity...</div>`;
+    return;
+  }
+  wrap.innerHTML=alertsList.map((a,i)=>`
+    <div class="alert-item${a.fresh||i===0?" fresh":""}">
+      <span class="alert-star">★ </span>${a.text}
+    </div>`).join("");
+}
+
+// ── Chat — user-only messages ────────────────────────────────
+// No auto-generated chat. Only the user sending manually,
+// and real messages from Twitch/YouTube chat via EventSub (future).
+function pushChat(platform, username, message) {
+  const body=document.getElementById("chat-body");
+  const svc=Object.values(SVCS).find(s=>s.name.toLowerCase().includes(platform)) || {short:"?",color:"var(--lime)"};
+  const div=document.createElement("div");
+  div.className="chat-msg";
+  div.innerHTML=`
+    <div class="chat-badge" style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.25);color:var(--lime)">${svc.short}</div>
+    <div><span class="chat-user">${username}: </span><span class="chat-text">${message}</span></div>`;
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+}
+
+function sendChat() {
+  const input=document.getElementById("chat-input");
+  const msg=input.value.trim(); if(!msg) return;
+  const body=document.getElementById("chat-body");
+  const div=document.createElement("div");
+  div.className="chat-msg";
+  div.innerHTML=`
+    <div class="chat-badge" style="background:rgba(200,255,0,.1);border:1px solid rgba(200,255,0,.25);color:var(--lime)">ME</div>
+    <div><span class="chat-user">You: </span><span class="chat-text">${msg}</span></div>`;
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+  input.value="";
+  // In production: send to Twitch/YouTube chat API via backend
+}
+document.getElementById("chat-input").addEventListener("keydown",e=>{ if(e.key==="Enter") sendChat(); });
+
+// ════════════════════════════════════════════════════
+// MODALS
+// ════════════════════════════════════════════════════
+
+function openModal(id) {
+  if(id==="src-modal") renderSourcesModal();
+  document.getElementById(id).classList.remove("hidden");
+}
+function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+function bgClose(e,id) { if(e.target===document.getElementById(id)) closeModal(id); }
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") document.querySelectorAll(".modal-overlay:not(.hidden)").forEach(m=>m.classList.add("hidden"));
+});
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+renderScenes();
+renderSourcesSidebar();
+renderChecklist();
+</script>
+</body>
+</html>

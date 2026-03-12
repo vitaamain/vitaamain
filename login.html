@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VitaaMain — Log in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#080808;color:#e8e8e0;font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;flex-direction:column}
+:root{--lime:#c8ff00}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.12em;color:#fff;display:flex;align-items:center;gap:9px;cursor:pointer;text-decoration:none}
+.logo-dot{width:8px;height:8px;background:var(--lime);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0}
+
+/* TOP BAR */
+.top-bar{padding:18px 40px;border-bottom:1px solid #111;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.back-btn{background:none;border:1px solid #1c1c1c;border-radius:6px;color:#3a3a3a;font-size:12px;font-weight:500;cursor:pointer;padding:7px 14px;font-family:'DM Sans',sans-serif;transition:all .15s;text-decoration:none;display:inline-block}
+.back-btn:hover{border-color:#333;color:#888}
+
+/* MAIN */
+.main{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow:hidden}
+.bg-glow{position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 50% 50%,rgba(200,255,0,.04) 0%,transparent 70%)}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.015) 1px,transparent 1px);background-size:48px 48px;-webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black,transparent);mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black,transparent)}
+
+/* CARD */
+.card{position:relative;z-index:1;width:100%;max-width:420px;animation:fadeUp .6s cubic-bezier(.16,1,.3,1) both}
+.card-inner{background:#0a0a0a;border:1px solid #1a1a1a;border-radius:16px;padding:36px 32px;box-shadow:0 32px 80px rgba(0,0,0,.6)}
+
+/* TAB SWITCHER */
+.tabs{display:flex;background:#060606;border-radius:8px;padding:3px;margin-bottom:28px;border:1px solid #141414}
+.tab{flex:1;padding:9px 0;border-radius:6px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;transition:all .2s}
+.tab.active{background:var(--lime);color:#080808}
+.tab.inactive{background:transparent;color:#2a2a2a}
+.tab.inactive:hover{color:#555}
+
+/* FORM */
+.form-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:.06em;color:#fff;margin-bottom:6px}
+.form-sub{font-size:13px;color:#2a2a2a;margin-bottom:24px;font-weight:300}
+
+.oauth-row{display:flex;gap:8px;margin-bottom:20px}
+.oauth-btn{flex:1;background:#0d0d0d;border-radius:8px;padding:11px 8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;font-family:'DM Sans',sans-serif;border:1px solid transparent}
+.oauth-btn:hover{transform:translateY(-1px)}
+.oauth-icon{width:16px;height:16px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff;font-weight:800;font-family:monospace;flex-shrink:0}
+.oauth-label{font-size:12px;font-weight:600;color:#3a3a3a}
+
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.divider-line{flex:1;height:1px;background:#141414}
+.divider-or{font-size:11px;color:#222;font-family:monospace}
+
+input{width:100%;background:#0d0d0d;border:1px solid #1c1c1c;border-radius:8px;padding:13px 16px;color:#e8e8e0;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;margin-bottom:12px;display:block}
+input:focus{border-color:rgba(200,255,0,.3)}
+input::placeholder{color:#222}
+
+.forgot{display:block;text-align:right;font-size:12px;color:#2a2a2a;text-decoration:none;margin-top:-4px;margin-bottom:20px;transition:color .15s}
+.forgot:hover{color:#666}
+
+.submit-btn{width:100%;background:var(--lime);color:#080808;font-weight:800;font-size:13px;padding:14px 0;border-radius:8px;border:none;cursor:pointer;letter-spacing:.07em;text-transform:uppercase;font-family:monospace;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.submit-btn:hover{background:#d6ff2a;transform:translateY(-1px);box-shadow:0 6px 24px rgba(200,255,0,.2)}
+.submit-btn:disabled{background:#9ab800;cursor:default;transform:none;box-shadow:none}
+
+.spinner{width:14px;height:14px;border:2px solid #080808;border-top-color:transparent;border-radius:50%;animation:spin .6s linear infinite}
+
+.terms{font-size:11px;color:#1c1c1c;text-align:center;margin-top:16px;line-height:1.6}
+
+.switch-mode{text-align:center;margin-top:20px;font-size:12px;color:#222;font-family:'DM Sans',sans-serif}
+.switch-btn{background:none;border:none;color:var(--lime);cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif;padding:0;text-decoration:underline;text-decoration-color:rgba(200,255,0,.3)}
+.switch-btn:hover{text-decoration-color:var(--lime)}
+
+/* SIDE DECORATION */
+.side-deco{position:fixed;right:0;top:0;bottom:0;width:380px;display:flex;flex-direction:column;justify-content:center;padding:40px;pointer-events:none;opacity:.5}
+.deco-card{background:#0a0a0a;border:1px solid #141414;border-radius:12px;padding:20px;margin-bottom:12px}
+.deco-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.deco-stat{text-align:center;background:#060606;border-radius:8px;padding:10px 6px}
+.deco-num{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--lime)}
+.deco-label{font-size:8px;color:#222;font-family:monospace;text-transform:uppercase;letter-spacing:.08em}
+.deco-alert{background:#0d0d0d;border-left:2px solid var(--lime);border-radius:4px;padding:7px 10px;font-size:10px;color:#333;font-family:monospace}
+
+@media(max-width:900px){.side-deco{display:none}}
+@media(max-width:480px){.card-inner{padding:28px 20px}.top-bar{padding:14px 20px}}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a href="index.html" class="logo"><div class="logo-dot"></div>VitaaMain</a>
+  <a href="index.html" class="back-btn">← Back to home</a>
+</div>
+
+<div class="main">
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <!-- Side decoration -->
+  <div class="side-deco">
+    <div style="font-size:9px;color:#1a1a1a;font-family:monospace;letter-spacing:.14em;text-transform:uppercase;margin-bottom:16px">Live preview</div>
+    <div class="deco-card">
+      <div style="font-size:8px;color:#222;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">● LIVE — Gameplay Scene</div>
+      <div class="deco-stat-row">
+        <div class="deco-stat"><div class="deco-num">1,482</div><div class="deco-label">Viewers</div></div>
+        <div class="deco-stat"><div class="deco-num">3.4k</div><div class="deco-label">Followers</div></div>
+        <div class="deco-stat"><div class="deco-num">2.1h</div><div class="deco-label">Uptime</div></div>
+      </div>
+      <div class="deco-alert"><span style="color:#c8ff00">★ ProGamer99</span> just subscribed!</div>
+    </div>
+    <div class="deco-card">
+      <div style="font-size:8px;color:#222;font-family:monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Streaming to</div>
+      <div style="display:flex;gap:6px">
+        <div style="height:22px;padding:0 8px;border-radius:4px;background:rgba(145,70,255,.15);border:1px solid rgba(145,70,255,.3);color:#9146FF;font-size:9px;font-family:monospace;font-weight:800;display:flex;align-items:center">TW</div>
+        <div style="height:22px;padding:0 8px;border-radius:4px;background:rgba(255,0,0,.15);border:1px solid rgba(255,0,0,.3);color:#FF0000;font-size:9px;font-family:monospace;font-weight:800;display:flex;align-items:center">YT</div>
+        <div style="height:22px;padding:0 8px;border-radius:4px;background:rgba(83,252,24,.15);border:1px solid rgba(83,252,24,.3);color:#53FC18;font-size:9px;font-family:monospace;font-weight:800;display:flex;align-items:center">KK</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-inner">
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab active" id="tab-login" onclick="setMode('login')">Log in</button>
+        <button class="tab inactive" id="tab-signup" onclick="setMode('signup')">Sign up</button>
+      </div>
+
+      <h2 class="form-title" id="form-title">Welcome back</h2>
+      <p class="form-sub" id="form-sub">Log in to your VitaaMain dashboard.</p>
+
+      <!-- OAuth -->
+      <div class="oauth-row">
+        <button class="oauth-btn" id="twitch-oauth" style="border-color:rgba(145,70,255,.2)" onclick="doLogin()">
+          <div class="oauth-icon" style="background:#9146FF">TW</div>
+          <span class="oauth-label">Continue with Twitch</span>
+        </button>
+        <button class="oauth-btn" id="google-oauth" style="border-color:rgba(255,0,0,.2)" onclick="doLogin()">
+          <div class="oauth-icon" style="background:#FF0000">G</div>
+          <span class="oauth-label">Continue with Google</span>
+        </button>
+      </div>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-or">or</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <!-- Name field (signup only) -->
+      <div id="name-field" style="display:none">
+        <input type="text" id="name-input" placeholder="Your name"/>
+      </div>
+
+      <input type="email" id="email-input" placeholder="Email address"/>
+      <input type="password" id="password-input" placeholder="Password"/>
+
+      <a href="#" class="forgot" id="forgot-link">Forgot password?</a>
+
+      <button class="submit-btn" id="submit-btn" onclick="doLogin()">
+        <span id="btn-text">Log in →</span>
+      </button>
+
+      <p class="terms" id="terms-text" style="display:none">
+        By signing up you agree to our Terms of Service and Privacy Policy.
+      </p>
+    </div>
+
+    <p class="switch-mode">
+      <span id="switch-text">Don't have an account?</span>
+      <button class="switch-btn" id="switch-btn" onclick="toggleMode()">Sign up free</button>
+    </p>
+  </div>
+</div>
+
+<script>
+let mode = "login";
+
+function setMode(m) {
+  mode = m;
+  const isLogin = m === "login";
+  document.getElementById("tab-login").className = "tab " + (isLogin ? "active" : "inactive");
+  document.getElementById("tab-signup").className = "tab " + (!isLogin ? "active" : "inactive");
+  document.getElementById("form-title").textContent = isLogin ? "Welcome back" : "Create your account";
+  document.getElementById("form-sub").textContent = isLogin ? "Log in to your VitaaMain dashboard." : "Free forever. No credit card needed.";
+  document.getElementById("name-field").style.display = isLogin ? "none" : "block";
+  document.getElementById("forgot-link").style.display = isLogin ? "block" : "none";
+  document.getElementById("btn-text").textContent = isLogin ? "Log in →" : "Create account →";
+  document.getElementById("terms-text").style.display = isLogin ? "none" : "block";
+  document.getElementById("switch-text").textContent = isLogin ? "Don't have an account?" : "Already have an account?";
+  document.getElementById("switch-btn").textContent = isLogin ? "Sign up free" : "Log in";
+}
+
+function toggleMode() { setMode(mode === "login" ? "signup" : "login"); }
+
+function doLogin() {
+  const btn = document.getElementById("submit-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div><span>Loading...</span>';
+  setTimeout(() => { window.location.href = "dashboard.html"; }, 1200);
+}
+
+// Hover effects for oauth buttons
+document.querySelectorAll(".oauth-btn").forEach(btn => {
+  const origBorder = btn.style.borderColor;
+  btn.addEventListener("mouseenter", () => btn.style.transform = "translateY(-1px)");
+  btn.addEventListener("mouseleave", () => btn.style.transform = "");
+});
+</script>
+</body>
+</html>
